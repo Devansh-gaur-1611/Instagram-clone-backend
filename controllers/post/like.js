@@ -5,7 +5,6 @@ const post = require('../../models/post')
 const like = async (req, res, next) => {
     const schema = Joi.object({
         postId: Joi.string().required(),
-        userId: Joi.string().required(),
         status: Joi.bool().required(),
     })
 
@@ -13,7 +12,8 @@ const like = async (req, res, next) => {
     if (error) {
         return next(error);
     }
-    const { postId, userId, status } = req.body
+    const { postId, status } = req.body
+    const userId = req.pathType == 1 ? req.userId : req.user.id
     if (userId != "") {
         const userExist = user.exists({ _id: userId })
         if (!userExist) {

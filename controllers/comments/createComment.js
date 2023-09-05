@@ -6,7 +6,6 @@ const createComment = async (req, res, next) => {
 
     const schema = Joi.object({
         postId: Joi.string().required(),
-        userId: Joi.string().required(),
         comment: Joi.string().required()
     })
 
@@ -15,8 +14,8 @@ const createComment = async (req, res, next) => {
         return next(error)
     }
 
-    const { postId, userId, comment } = req.body
-
+    const { postId, comment } = req.body
+    const userId = req.pathType == 1 ? req.userId : req.user.id
     const user = await User.findOne({ _id: userId })
     if (!user) {
         return res.status(401).json({ message: "user not found" })
