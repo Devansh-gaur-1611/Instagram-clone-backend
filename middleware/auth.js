@@ -1,27 +1,30 @@
-const jwtService = require('../services/JwtServices')
+const jwtService = require("../services/JwtServices");
 
 const auth = async (req, res, next) => {
+  if (!req.user || req.user == {}) {
     const authHeader = req.headers.authorization;
-    // console.log(req.headers)
-    console.log(authHeader)
-    // clg
 
     if (!authHeader) {
-        return res.status(400).json({ error: "Bad Request Sed life" })
+      return res.status(400).json({ error: "Bad Request" });
     }
 
     const token = authHeader.split(" ")[1];
-    try { 
-        // console.log("Hi");
-        const id = jwtService.verify(token) 
-        if(!id){
-            return res.status(401).json({error:"Unauth"})
-        }
-        next()
-    }catch (e) {
-        return res.status(401).json({error:"Unauth"})
+    try {
+      const id = jwtService.verify(token);
+      if (!id) {
+        return res.status(401).json({ error: "Unauth" });
+      }
+      // console.log(id)
+      req.userId = id.id;
+      req.pathType = 1;// path = 1 = jwt token
+      next();
+    } catch (e) {
+      return res.status(401).json({ error: "Unauth" });
     }
+  } else {
+    req.pathType = 2;// 2 = oAuth
+    next();
+  }
+};
 
-}
-
-module.exports = auth
+module.exports = auth;
